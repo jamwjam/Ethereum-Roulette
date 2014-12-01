@@ -73,7 +73,7 @@ class RouletteFrame(Frame):
 		self.initUI()
 
 	def initUI(self):
-		global ans, ans2
+		global ans, ans2, rando
 		self.parent.title("Ethereum Roulette")
 		self.style = Style()
 		self.style.theme_use("default")
@@ -89,6 +89,19 @@ class RouletteFrame(Frame):
 		self.txt.place(x = 0, y = 22)
 		print("Player 1's turn...");
 		self.txt.insert(Tkinter.END, "\nPlayer 1's turn...");
+		
+		
+		## Begin Inserted code ##
+		p1_input = input('Player 1 input your number!: ');
+		p2_input = input('Player 2 input your number!: ');
+		
+		# Input two generated numbers into the contract 
+		txSpecial = transactions.Transaction(barrel_nonce,10**12,10000,contract,0,serpent.encode_datalist([p1_input,p2_input,0])).sign(key);
+		result, ans = processblock.apply_transaction(genesis,txSpecial);
+		
+		# Return random number
+		rando = genesis.get_storage_data(contract,2);
+		## End Inserted code ##
 
 	def load_dots(self, dot_count):
 		for i in range(dot_count):
@@ -132,19 +145,6 @@ class RouletteFrame(Frame):
 	def shoot(self):
 		global p1_nonce, p2_nonce, random_nonce, contract, key, key2, wusser, genesis, flag, barrel
 		
-		
-		## Begin Inserted code ##
-		p1_input = input('Player 1 input your number!: ');
-		p2_input = input('Player 2 input your number!: ');
-		
-		# Input two generated numbers into the contract 
-		txSpecial = transactions.Transaction(barrel_nonce,10**12,10000,contract,0,serpent.encode_datalist([p1_input,p2_input,0])).sign(key);
-		result, ans = processblock.apply_transaction(genesis,txSpecial);
-		
-		# Return random number
-		rando = genesis.get_storage_data(contract,2);
-		## End Inserted code ##
-		
 		#rando = random.randint(1,6);
 		
 		self.txt.configure(state=Tkinter.NORMAL)
@@ -175,6 +175,8 @@ class RouletteFrame(Frame):
 				print("\tThe barrel was empty!")
 				time.sleep(.5)
 				self.txt.delete(0.0, Tkinter.END)
+				rando = ((rando + 1) % 6)
+				
 			self.txt.insert(Tkinter.END, "\nPlayer 2's turn...");
 			print("\nPlayer 2's turn...");
 			wusser = 2;
@@ -207,6 +209,8 @@ class RouletteFrame(Frame):
 				print("\tThe barrel was empty!")
 				time.sleep(.5)
 				self.txt.delete(0.0, Tkinter.END)
+				rando = ((rando + 1) % 6)
+				
 			self.txt.insert(Tkinter.END, "\nPlayer 1's turn...");
 			print("\nPlayer 1's turn...");
 			# set up for the next player

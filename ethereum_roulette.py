@@ -22,7 +22,7 @@ code:
         return (contract.storage[player])
     # If a message with two items [from, to] are sent, that's a transfer request. Each transfer
     # is of value 2000
-    else:
+    if msg.datasize == 2:
         from = msg.data[0] # The player who is sending money
         fromvalue = contract.storage[from] # Sender's balance
         to = msg.data[1] # The player who is receiving money
@@ -35,6 +35,15 @@ code:
             return(1)
         else: #player doesnt have enough, therefore he is the loser
             return(0)
+    if msg.datasize == 3:
+    	p1_input = msg.data[0]
+  	p2_input = msg.data[1]
+  
+  	if p1_input == 0 or p2_input == 0:
+  	   return 0;
+  	
+   	contract.storage[2] = p1_randint ^ p2_randint
+   	return (contract.storage[2] % 6) 
 """
 
 flag = -1

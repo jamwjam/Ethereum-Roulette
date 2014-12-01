@@ -49,10 +49,15 @@ code:
 flag = -1
 ans = 0
 ans2 = 0
-barrel = random.randint(1,6)
+#barrel = random.randint(1,6)
+barrel = 0;
 #keep track of the nonces
+
+random_nonce = 3
+
 p1_nonce = 2
 p2_nonce = 1
+
 contract = 0
 key = 0
 key2 = 0
@@ -125,28 +130,47 @@ class RouletteFrame(Frame):
 		exit();
 
 	def shoot(self):
-		global p1_nonce, p2_nonce, contract, key, key2, wusser, genesis, flag, barrel
-		rando = random.randint(1,6);
+		global p1_nonce, p2_nonce, random_nonce, contract, key, key2, wusser, genesis, flag, barrel
+		
+		
+		## Begin Inserted code ##
+		p1_input = input('Player 1 input your number!: ');
+		p2_input = input('Player 2 input your number!: ');
+		
+		# Input two generated numbers into the contract 
+		txSpecial = transactions.Transaction(barrel_nonce,10**12,10000,contract,0,serpent.encode_datalist([p1_input,p2_input,0])).sign(key);
+		result, ans = processblock.apply_transaction(genesis,txSpecial);
+		
+		# Return random number
+		rando = genesis.get_storage_data(contract,2);
+		## End Inserted code ##
+		
+		#rando = random.randint(1,6);
+		
 		self.txt.configure(state=Tkinter.NORMAL)
 		self.txt.delete(0.0, Tkinter.END)
 		if(wusser == 1):
 			self.print_with_dots("\tThe barrel is spinning",5)
 			if(rando == barrel):
-				barrel = random.randint(1,6)
-				print("Bang! You lost this round!");
-				self.txt.insert(Tkinter.END, "Bang! You lost this round!");
+				
+				#barrel = random.randint(1,6)
+				
+				print("Bang! You lost!");
+				self.txt.insert(Tkinter.END, "Bang! You lost!");
 				time.sleep(.5)
 				tx4 = transactions.Transaction(p1_nonce,10**12,10000,contract,0,serpent.encode_datalist([0,1])).sign(key)
 				result, ans = processblock.apply_transaction(genesis,tx4);
-			
-				if(genesis.get_storage_data(contract,0) == 0): #player doesnt have enough money
-				    flag = 2;
-				    print("\tPlayer 1 has no more funds")
-				    self.gameover();
-				else:
-				    print('\tPlayer 1 now has : %s and Player 2 now has: %s ' % (str(genesis.get_storage_data(contract,0)),str(genesis.get_storage_data(contract,1))))
-				    p1_nonce = p1_nonce + 1;
-		    		time.sleep(.4)
+				
+				flag = 2;
+				self.gameover();
+				#if(genesis.get_storage_data(contract,0) == 0): #player doesnt have enough money
+				#    flag = 2;
+				#    print("\tPlayer 1 has no more funds")
+				#    self.gameover();
+				#else:
+				#    print('\tPlayer 1 now has : %s and Player 2 now has: %s ' % (str(genesis.get_storage_data(contract,0)),str(genesis.get_storage_data(contract,1))))
+				#    p1_nonce = p1_nonce + 1;
+		    		#time.sleep(.4)
 			else:
 				print("\tThe barrel was empty!")
 				time.sleep(.5)
@@ -159,19 +183,25 @@ class RouletteFrame(Frame):
 			self.print_with_dots("\tThe barrel is spinning",5)
 			# the person was shot!
 		    	if(rando == barrel):
-				barrel = random.randint(1,6)
-				print("Bang! You lost this round!");
-				self.txt.insert(Tkinter.END, "Bang! You lost this round!");
+				
+				#barrel = random.randint(1,6)
+				
+				print("Bang! You lost!");
+				self.txt.insert(Tkinter.END, "Bang! You lost!");
 				time.sleep(.5)
 				tx5 = transactions.Transaction(p2_nonce,10**12,10000,contract,0,serpent.encode_datalist([1,0])).sign(key2)
        			 	result, ans = processblock.apply_transaction(genesis,tx5);
-				if(genesis.get_storage_data(contract,1) == 0): #player doesnt have enough money
-				    flag = 1;
-				    print("\tPlayer 2 has no more funds")
-				    self.gameover();
-				else:
-				    print('\tPlayer 1 now has : %s and Player 2 now has: %s ' % (str(genesis.get_storage_data(contract,0)),str(genesis.get_storage_data(contract,1))))
-				    p2_nonce = p2_nonce + 1;
+				
+				flag = 1;
+				self.gameover();
+				
+				#if(genesis.get_storage_data(contract,1) == 0): #player doesnt have enough money
+				#    flag = 1;
+				#    print("\tPlayer 2 has no more funds")
+				#    self.gameover();
+				#else:
+				#    print('\tPlayer 1 now has : %s and Player 2 now has: %s ' % (str(genesis.get_storage_data(contract,0)),str(genesis.get_storage_data(contract,1))))
+				#    p2_nonce = p2_nonce + 1;
             			time.sleep(.4)
 	  	 	else:
 				print("\tThe barrel was empty!")

@@ -96,7 +96,7 @@ class RouletteFrame(Frame):
 		p2_input = input('Player 2 input your number!: ');
 		
 		# Input two generated numbers into the contract 
-		txSpecial = transactions.Transaction(barrel_nonce,10**12,10000,contract,0,serpent.encode_datalist([p1_input,p2_input,0])).sign(key);
+		txSpecial = transactions.Transaction(random_nonce,10**12,10000,contract,0,serpent.encode_datalist([p1_input,p2_input,0])).sign(key);
 		result, ans = processblock.apply_transaction(genesis,txSpecial);
 		
 		# Return random number
